@@ -7,6 +7,7 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
+import { customAlphabet } from "nanoid";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -46,6 +47,21 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+  },
+  events: {
+    signIn: async ({ user, isNewUser }) => {
+      const nanoid = customAlphabet("1234567890", 10);
+      if (isNewUser) {
+        await db.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            username: "user" + nanoid(),
+          },
+        });
+      }
+    },
   },
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
