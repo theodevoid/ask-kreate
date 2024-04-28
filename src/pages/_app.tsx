@@ -1,15 +1,16 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
-import { Inter } from "next/font/google";
+import { Familjen_Grotesk } from "next/font/google";
 
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import { Header } from "~/components/layout/Header";
 
-const inter = Inter({
+const grotesk = Familjen_Grotesk({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-grotesk",
 });
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -17,11 +18,18 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <main className={`font-sans ${inter.variable}`}>
-        <Component {...pageProps} />
-      </main>
-    </SessionProvider>
+    <>
+      <SessionProvider session={session}>
+        <style
+          jsx
+          global
+        >{`:root { --font-grotesk: ${grotesk.style.fontFamily};}}`}</style>
+        <main className={`font-sans ${grotesk.variable}`}>
+          <Header />
+          <Component {...pageProps} />
+        </main>
+      </SessionProvider>
+    </>
   );
 };
 
