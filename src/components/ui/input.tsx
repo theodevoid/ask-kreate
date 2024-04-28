@@ -1,25 +1,35 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "~/lib/utils"
+import { cn } from "~/lib/utils";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  leftAddon?: React.ReactElement;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, leftAddon, ...props }, ref) => {
     return (
-      <input
-        type={type}
+      <div
         className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
+          "has-[:focus-visible]:neu-pressed neu neu-active neu-focus placeholder:text-muted-foreground flex h-11 w-full items-center rounded-md bg-transparent px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+          className,
         )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Input.displayName = "Input"
+      >
+        {leftAddon && <div className="border-r-2 pr-2">{leftAddon}</div>}
+        <input
+          className={cn(
+            "h-full w-full bg-transparent text-lg outline-none",
+            leftAddon && "ml-3",
+          )}
+          type={type}
+          ref={ref}
+          {...props}
+        />
+      </div>
+    );
+  },
+);
+Input.displayName = "Input";
 
-export { Input }
+export { Input };

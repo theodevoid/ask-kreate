@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { withUt } from "uploadthing/tw";
 
 // PURPLE B085E7 primary
 // GREEN D7F184 accent
@@ -89,4 +90,4 @@ const config = {
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
 
-export default config;
+export default withUt(config);
