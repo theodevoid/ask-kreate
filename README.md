@@ -1,12 +1,15 @@
 ### TODO
 
-- [ ] auth
+- [x] auth
 - [ ] user profile
 - [ ] ask user
-- [ ] upvote questions
+- [ ] answer questions
+  - [ ] archive/delete
+  - [ ] send email on answer
 - [ ] sort questions
   - [ ] by date
   - [ ] by upvotes
+- [ ] upvote questions
 - [ ] filter questions
   - [ ] by answered
   - [ ] by tags

@@ -54,7 +54,7 @@ export const SocialMediaButtons: React.FC<SocialMediaButtonsProps> = ({
   const twitchUrl = `https://twitch.tv/${twitchUsername}`;
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 gap-4 lg:grid-cols-6">
       {instagramUsername && (
         <SocialMediaLinkButton url={instagramUrl}>
           <InstagramLogoIcon className="h-6 w-6" />

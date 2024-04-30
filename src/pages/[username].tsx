@@ -1,15 +1,17 @@
 import { PageContainer } from "~/components/layout/PageContainer";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button } from "~/components/ui/button";
 import { Title } from "~/components/ui/title";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { AspectRatio } from "~/components/ui/aspect-ratio";
-import Image from "next/image";
 import { api } from "~/utils/api";
 import { SocialMediaButtons } from "~/features/profile/components";
 import { GetServerSideProps } from "next";
 import { HeadMetaData } from "~/components/layout/HeadMetaData";
 import React from "react";
 import { db } from "~/server/db";
+import { Section } from "~/components/layout/Section";
+import { formatDistance } from "date-fns";
+import { Badge } from "~/components/ui/badge";
+import { QuestionCard } from "~/features/ask/components";
 
 type UserPageProps = {
   username: string;
@@ -27,60 +29,67 @@ const UserPage: React.FC<UserPageProps> = ({ username, name }) => {
   );
 
   return (
-    <PageContainer>
+    <PageContainer className="lg:max-w-screen-md">
       {/* TODO: Add OG image from user's profile picture, needs a bit of design */}
       <HeadMetaData title={`${name} (@${username})`} />
 
-      <div className="mx-4 grid grid-cols-12 gap-x-4">
+      <div className="grid grid-cols-12">
         {/* USER INFO SECTION */}
-        <div className="bg-background col-span-full mt-16 flex h-fit flex-col gap-3 rounded-md border-2 p-4 lg:col-span-4 lg:p-8">
-          <Avatar className="-mt-16 h-[100px] w-[100px] border-[2px] lg:-mt-20">
-            <AvatarFallback className="bg-accent">
-              <span className="text-4xl font-bold">
-                {user?.name?.charAt(0)}
-              </span>
-            </AvatarFallback>
-            <AvatarImage src={user?.image ?? ""} />
-          </Avatar>
+        <div className="col-span-full mb-4 flex h-fit flex-col gap-3 bg-background p-4 lg:mb-0 lg:border-x-2 lg:p-8">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-[100px] w-[100px] border-[2px]">
+              <AvatarFallback className="bg-accent">
+                <span className="text-4xl font-bold">
+                  {user?.name?.charAt(0)}
+                </span>
+              </AvatarFallback>
+              <AvatarImage src={user?.image ?? ""} />
+            </Avatar>
 
-          <div>
-            <Title className="max-w-72 text-center">{user?.name}</Title>
-            <p className="text-lg font-bold">@{user?.username}</p>
+            <div>
+              <Title className="max-w-72 text-center">{user?.name}</Title>
+              <p className="text-lg font-bold">@{user?.username}</p>
+            </div>
           </div>
 
           {/* Bio */}
           {user?.bio && <p>{user.bio}</p>}
 
           {/* Social links */}
-          <SocialMediaButtons
+          {/* <SocialMediaButtons
             instagramUsername={"username"}
             youtubeUsername={"username"}
             tiktokUsername={"username"}
             twitterUsername={"username"}
             twitchUsername={"username"}
-          />
+          /> */}
         </div>
 
-        <div className="col-span-full mt-8 lg:col-span-8 lg:mt-16">
+        <div className="col-span-full border-t-2 lg:border-x-2">
           {/* ASK INPUT */}
-          <div className="flex h-fit w-full flex-col rounded-md border-2 p-4 ">
-            <div className="bg-accent -mt-8 mb-4 w-fit self-center rounded-md border-2 px-4 text-center text-lg font-bold">
-              Ask a question
-            </div>
-
+          <Section title="Ask a question" className="w-full border-b-2 pb-8">
             <textarea
               placeholder="What do you think about..."
-              className="resize-none rounded-md border-2 bg-white p-2 outline-none"
+              className="w-full resize-none rounded-md border-2 bg-card p-2 outline-none"
+              rows={3}
             />
 
             <Button className="mt-2 w-full">Send</Button>
-          </div>
+          </Section>
 
-          <div className="mt-8 flex h-fit w-full flex-col rounded-md border-2">
-            <div className="bg-accent -mt-4 mb-4 w-fit self-center rounded-md border-2 px-4 text-center text-lg font-bold">
-              Feed
+          <Section title="Feed" className="border-b-0 px-0">
+            <div className="flex flex-col gap-2 px-4 pb-4">
+              <QuestionCard
+                createdAt={new Date()}
+                username="gaho"
+                avatarUrl=""
+                body="Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+              Sit recusandae facere assumenda veniam quis, dolores maiores
+              aspernatur minus autem! Non."
+                upvotes={2100}
+              />
             </div>
-          </div>
+          </Section>
         </div>
       </div>
     </PageContainer>

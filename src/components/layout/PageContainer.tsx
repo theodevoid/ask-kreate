@@ -11,10 +11,7 @@ export const PageContainer = forwardRef<
       <HeadMetaData />
       <main
         ref={ref}
-        className={cn(
-          "container md:max-w-screen-md lg:max-w-screen-lg",
-          className,
-        )}
+        className={cn("container lg:max-w-screen-lg", className)}
         {...props}
       >
         {children}
