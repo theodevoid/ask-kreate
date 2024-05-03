@@ -3,14 +3,11 @@ import { Button } from "~/components/ui/button";
 import { Title } from "~/components/ui/title";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { api } from "~/utils/api";
-import { SocialMediaButtons } from "~/features/profile/components";
-import { GetServerSideProps } from "next";
+import { type GetServerSideProps } from "next";
 import { HeadMetaData } from "~/components/layout/HeadMetaData";
 import React from "react";
 import { db } from "~/server/db";
 import { Section } from "~/components/layout/Section";
-import { formatDistance } from "date-fns";
-import { Badge } from "~/components/ui/badge";
 import { QuestionCard } from "~/features/ask/components";
 
 type UserPageProps = {
