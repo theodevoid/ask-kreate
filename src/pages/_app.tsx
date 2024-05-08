@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import { Header } from "~/components/layout/Header";
+import { Toaster } from "~/components/ui/sonner";
 
 const grotesk = Familjen_Grotesk({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <main className={`font-sans ${grotesk.variable}`}>
           <Header />
           <Component {...pageProps} />
+          <Toaster />
         </main>
       </SessionProvider>
     </>

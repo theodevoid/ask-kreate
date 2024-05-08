@@ -13,12 +13,7 @@ export const Section: React.FC<SectionProps> = ({
   className,
 }) => {
   return (
-    <div
-      className={cn(
-        "flex h-fit w-full flex-col border-b-2 p-4 pb-8",
-        className,
-      )}
-    >
+    <div className={cn("flex h-fit w-full flex-col p-4 pb-8", className)}>
       <div className="-mt-8 mb-4 w-fit self-center rounded-md border-2 bg-accent px-4 text-center text-lg font-bold">
         {title}
       </div>

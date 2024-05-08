@@ -1,5 +1,4 @@
 import { PageContainer } from "~/components/layout/PageContainer";
-import { Button } from "~/components/ui/button";
 import { Title } from "~/components/ui/title";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { api } from "~/utils/api";
@@ -8,7 +7,9 @@ import { HeadMetaData } from "~/components/layout/HeadMetaData";
 import React from "react";
 import { db } from "~/server/db";
 import { Section } from "~/components/layout/Section";
-import { QuestionCard } from "~/features/ask/components";
+import { QuestionCard, AskQuestionForm } from "~/features/ask/components";
+import { type AskQuestionFormSchema } from "~/features/ask/forms";
+import { toast } from "sonner";
 
 type UserPageProps = {
   username: string;
@@ -24,6 +25,24 @@ const UserPage: React.FC<UserPageProps> = ({ username, name }) => {
       enabled: !!username,
     },
   );
+  const { mutate: createQuestion, isPending } =
+    api.ask.createQuestion.useMutation({
+      onError: ({ message }) => {
+        toast.error(message);
+      },
+      onSuccess: () => {
+        toast.success("Question submitted to creator 🚀", {
+          position: "top-right",
+        });
+      },
+    });
+
+  const createQuestionHandler = (values: AskQuestionFormSchema) => {
+    createQuestion({
+      body: values.body,
+      toUserId: user!.id,
+    });
+  };
 
   return (
     <PageContainer className="lg:max-w-screen-md">
@@ -51,31 +70,17 @@ const UserPage: React.FC<UserPageProps> = ({ username, name }) => {
 
           {/* Bio */}
           {user?.bio && <p>{user.bio}</p>}
-
-          {/* Social links */}
-          {/* <SocialMediaButtons
-            instagramUsername={"username"}
-            youtubeUsername={"username"}
-            tiktokUsername={"username"}
-            twitterUsername={"username"}
-            twitchUsername={"username"}
-          /> */}
         </div>
 
-        <div className="col-span-full border-t-2 lg:border-x-2">
+        <div className="col-span-full border-t-2 ">
           {/* ASK INPUT */}
-          <Section title="Ask a question" className="w-full border-b-2 pb-8">
-            <textarea
-              placeholder="What do you think about..."
-              className="w-full resize-none rounded-md border-2 bg-card p-2 outline-none"
-              rows={3}
-            />
+          <AskQuestionForm
+            loading={isPending}
+            onSubmit={createQuestionHandler}
+          />
 
-            <Button className="mt-2 w-full">Send</Button>
-          </Section>
-
-          <Section title="Feed" className="border-b-0 px-0">
-            <div className="flex flex-col gap-2 px-4 pb-4">
+          <Section title="Feed" className="h-full border-b-0 px-0">
+            <div className="flex flex-col gap-2 pb-4">
               <QuestionCard
                 createdAt={new Date()}
                 username="gaho"
