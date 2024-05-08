@@ -10,6 +10,14 @@ import { Section } from "~/components/layout/Section";
 import { QuestionCard, AskQuestionForm } from "~/features/ask/components";
 import { type AskQuestionFormSchema } from "~/features/ask/forms";
 import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 type UserPageProps = {
   username: string;
@@ -36,6 +44,25 @@ const UserPage: React.FC<UserPageProps> = ({ username, name }) => {
         });
       },
     });
+  const {
+    data: getQuestionsResponse,
+    fetchNextPage,
+    isLoading: getQuestionsIsLoading,
+    refetch: refetchQuestions,
+  } = api.ask.getQuestions.useInfiniteQuery(
+    {
+      limit: 5,
+      userId: user?.id ?? "",
+    },
+    {
+      getNextPageParam: ({ nextCursor, hasNext }) => {
+        if (hasNext) {
+          return nextCursor;
+        }
+      },
+      enabled: Boolean(user),
+    },
+  );
 
   const createQuestionHandler = (values: AskQuestionFormSchema) => {
     createQuestion({
@@ -80,16 +107,45 @@ const UserPage: React.FC<UserPageProps> = ({ username, name }) => {
           />
 
           <Section title="Feed" className="h-full border-b-0 px-0">
-            <div className="flex flex-col gap-2 pb-4">
-              <QuestionCard
-                createdAt={new Date()}
-                username="gaho"
-                avatarUrl=""
-                body="Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Sit recusandae facere assumenda veniam quis, dolores maiores
-              aspernatur minus autem! Non."
-                upvotes={2100}
-              />
+            {/* <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by: Latest" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select> */}
+            <div className="mt-2 flex flex-col gap-2 px-4 pb-4 lg:px-0">
+              {getQuestionsResponse?.pages.map((group, i) => (
+                <React.Fragment key={i}>
+                  {group.data.map((question) => (
+                    <QuestionCard
+                      key={question.id}
+                      createdAt={question.createdAt}
+                      username={question.askedBy.username ?? ""}
+                      avatarUrl={question.askedBy.image ?? ""}
+                      body={question.body}
+                      upvotes={undefined}
+                    />
+                  ))}
+                </React.Fragment>
+              ))}
+              {getQuestionsResponse?.pages[
+                getQuestionsResponse.pages.length - 1
+              ]?.hasNext &&
+                (getQuestionsIsLoading ? (
+                  "Loading..."
+                ) : (
+                  <Button
+                    onClick={() => fetchNextPage()}
+                    className="w-fit self-center"
+                    variant="secondary"
+                  >
+                    See more
+                  </Button>
+                ))}
             </div>
           </Section>
         </div>

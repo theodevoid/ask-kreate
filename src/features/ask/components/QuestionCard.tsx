@@ -18,7 +18,7 @@ type QuestionCardProps = {
   username: string;
   createdAt: Date;
   body: string;
-  upvotes: number;
+  upvotes?: number;
 };
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -26,7 +26,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   body,
   createdAt,
   username,
-  upvotes = 0,
+  upvotes = undefined,
 }) => {
   return (
     <div className="flex items-start gap-2 rounded-md border-2 bg-card p-4">
@@ -40,7 +40,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <p className="font-bold">
             {username} &#x2022;{" "}
             <span className="text-sm text-muted-foreground">
-              {formatDistance(new Date(), createdAt, {
+              {formatDistance(createdAt, new Date(), {
                 addSuffix: true,
               })}
             </span>
@@ -68,12 +68,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </Link>
         </div>
 
-        <div className="mt-2 flex justify-end">
-          <Button size="sm" variant="ghost" className="gap-2">
-            <ThumbsUp className="h-4 w-4" />
-            <span className="text-base">{toAbbreviatedNumber(upvotes)}</span>
-          </Button>
-        </div>
+        {typeof upvotes === "number" && (
+          <div className="mt-2 flex justify-end">
+            <Button size="sm" variant="ghost" className="gap-2">
+              <ThumbsUp className="h-4 w-4" />
+              <span className="text-base">{toAbbreviatedNumber(upvotes)}</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
