@@ -1,8 +1,8 @@
 ### TODO
 
 - [x] auth
-- [ ] user profile
-- [ ] ask user
+- [x] user profile
+- [x] ask user
 - [ ] answer questions
   - [ ] archive/delete
   - [ ] send email on answer

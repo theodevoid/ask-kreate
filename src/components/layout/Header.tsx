@@ -6,9 +6,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 export const Header = () => {
   const { data } = useSession();
@@ -27,7 +28,7 @@ export const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar>
-                <AvatarImage src={data?.user.image || ""} />
+                <AvatarImage src={data?.user.image ?? ""} />
                 <AvatarFallback className="font-bold">
                   {data?.user.name?.charAt(0)}
                 </AvatarFallback>
@@ -35,6 +36,12 @@ export const Header = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
+              <Link href={`/${data.user.username}`}>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" /> My Profile
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </DropdownMenuItem>
