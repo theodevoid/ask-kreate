@@ -99,8 +99,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Overlay</SidebarGroupLabel>
+        {/* <SidebarGroup>
+          <SidebarGroupLabel>Questions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {overlayItems.map((item) => (
@@ -120,30 +120,7 @@ export function AppSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Finance</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {financeItems.map((item) => (
-                <SidebarMenuItem
-                  className={cn(
-                    router.pathname === item.url ? "bg-primary/10" : "",
-                  )}
-                  key={item.title}
-                >
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon strokeWidth="3" className="!size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
     </Sidebar>
   );

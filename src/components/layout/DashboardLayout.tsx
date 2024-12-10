@@ -40,8 +40,8 @@ export const DashboardLayout = (props: PropsWithChildren) => {
             </Button>
           </div>
         </header>
-        <main className="flex flex-1 flex-col gap-4 bg-secondary/40 p-4 sm:p-8 lg:p-16">
-          {props.children}
+        <main className="flex flex-1 flex-col items-center gap-4 bg-secondary/40 p-4 sm:p-8 lg:p-16">
+          <div className="w-full max-w-screen-lg">{props.children}</div>
         </main>
       </SidebarInset>
     </SidebarProvider>
