@@ -36,11 +36,10 @@ const mockQuestions = [
   },
 ];
 
-const SessionDetailPage: NextPageWithLayout = () => {
+const DashboardSessionDetailPage: NextPageWithLayout = () => {
   return (
     <div>
       <div className="mb-8 flex flex-col">
-        <h3 className="mb-6 text-3xl font-bold">Session Details</h3>
         <SessionInfoCard
           code="1234ABCDE"
           title="React: Components"
@@ -62,8 +61,8 @@ const SessionDetailPage: NextPageWithLayout = () => {
   );
 };
 
-SessionDetailPage.getLayout = function getLayout(page: ReactElement) {
+DashboardSessionDetailPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
 
-export default SessionDetailPage;
+export default DashboardSessionDetailPage;

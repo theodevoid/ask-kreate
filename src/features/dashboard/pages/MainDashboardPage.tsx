@@ -20,6 +20,7 @@ import {
 import { CreateSessionFormInner } from "../components/CreateSessionFormInner";
 import { api } from "~/utils/api";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const MainDashboardPage: NextPageWithLayout = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
@@ -59,15 +60,16 @@ const MainDashboardPage: NextPageWithLayout = () => {
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {questionSessionQuery.data?.map((session) => {
             return (
-              <QnASessionCard
-                key={session.id}
-                code={session.code}
-                title={session.title}
-                startDate={session.startDate}
-                endDate={session.endDate}
-                isActive={session.isActive}
-                questionCount={session.estimatedQuestionCount}
-              />
+              <Link key={session.id} href={"/dashboard/session/" + session.id}>
+                <QnASessionCard
+                  code={session.code}
+                  title={session.title}
+                  startDate={session.startDate}
+                  endDate={session.endDate}
+                  isActive={session.isActive}
+                  questionCount={session.estimatedQuestionCount}
+                />
+              </Link>
             );
           })}
         </div>

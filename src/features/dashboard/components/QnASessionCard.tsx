@@ -1,4 +1,4 @@
-import { Calendar, Hash, MessageCircle } from "lucide-react";
+import { Calendar, Ellipsis, Hash, MessageCircle } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import {
   Card,
@@ -8,6 +8,14 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { format } from "date-fns";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { Button } from "~/components/ui/button";
 
 interface QnASessionCardProps {
   title: string;
@@ -53,10 +61,29 @@ export const QnASessionCard = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex justify-between">
         <Badge variant={isActive ? "default" : "secondary"}>
           {isActive ? "Active" : "Inactive"}
         </Badge>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button size="icon" variant="ghost">
+              <Ellipsis />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("inactive");
+              }}
+            >
+              Set Inactive
+            </DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
     </Card>
   );

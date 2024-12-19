@@ -1,1 +1,1 @@
-export { default } from "~/features/dashboard/pages/SessionDetailPage";
+export { default } from "~/features/dashboard/pages/DashboardSessionDetailPage";

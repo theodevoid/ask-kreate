@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { customAlphabet } from "nanoid";
 
 export const questionSessionRouter = createTRPCRouter({
@@ -50,4 +54,36 @@ export const questionSessionRouter = createTRPCRouter({
 
     return questionSessions;
   }),
+
+  getById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { id } = input;
+
+      const questionSession = await db.questionSession.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          code: true,
+          title: true,
+          isActive: true,
+          startDate: true,
+          endDate: true,
+          estimatedQuestionCount: true,
+          user: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      });
+
+      return questionSession;
+    }),
 });
