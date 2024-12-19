@@ -81,9 +81,42 @@ export const questionSessionRouter = createTRPCRouter({
               username: true,
             },
           },
+          questions: {
+            select: {
+              id: true,
+              body: true,
+              createdAt: true,
+              isArchived: true,
+              isPinned: true,
+              name: true,
+              userId: true,
+            },
+          },
         },
       });
 
       return questionSession;
+    }),
+
+  createQuestion: protectedProcedure
+    .input(
+      z.object({
+        body: z.string().min(3).max(280),
+        name: z.string().max(30).optional(),
+        questionSessionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { body, name, questionSessionId } = input;
+      const { db, user } = ctx;
+
+      await db.question.create({
+        data: {
+          body,
+          name,
+          userId: user.id,
+          questionSessionId,
+        },
+      });
     }),
 });

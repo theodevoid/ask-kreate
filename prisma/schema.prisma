@@ -29,7 +29,22 @@ model QuestionSession {
     isActive               Boolean  @default(true)
     estimatedQuestionCount Int      @default(0)
 
-    user      Profile  @relation(fields: [userId], references: [userId])
+    user      Profile    @relation(fields: [userId], references: [userId])
     userId    String
-    createdAt DateTime @default(now())
+    createdAt DateTime   @default(now())
+    questions Question[]
+}
+
+model Question {
+    id String @id @default(cuid())
+
+    body       String
+    name       String?
+    isArchived Boolean @default(false)
+    isPinned   Boolean @default(false)
+
+    userId            String
+    questionSessionId String
+    questionSession   QuestionSession @relation(fields: [questionSessionId], references: [id])
+    createdAt         DateTime        @default(now())
 }
