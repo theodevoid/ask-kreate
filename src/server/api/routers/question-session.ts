@@ -157,6 +157,7 @@ export const questionSessionRouter = createTRPCRouter({
       return await ctx.db.question.findMany({
         where: {
           questionSessionId: input.sessionId,
+          isArchived: false,
         },
         select: {
           id: true,
@@ -272,6 +273,67 @@ export const questionSessionRouter = createTRPCRouter({
             userId: user.id,
           },
         });
+      });
+    }),
+
+  archiveQuestion: protectedProcedure
+    .input(
+      z.object({
+        questionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { questionId } = input;
+      const { db, user } = ctx;
+
+      await db.question.update({
+        where: {
+          questionSession: {
+            userId: user.id,
+          },
+          id: questionId,
+        },
+        data: {
+          isArchived: true,
+        },
+      });
+    }),
+
+  pinQuestion: protectedProcedure
+    .input(
+      z.object({
+        questionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { questionId } = input;
+      const { db, user } = ctx;
+
+      const pinnedQuestion = await db.question.update({
+        where: {
+          questionSession: {
+            userId: user.id,
+          },
+          id: questionId,
+        },
+        data: {
+          isPinned: true,
+        },
+      });
+
+      await db.question.updateMany({
+        where: {
+          isPinned: true,
+          questionSession: {
+            userId: user.id,
+          },
+          NOT: {
+            id: pinnedQuestion.id,
+          },
+        },
+        data: {
+          isPinned: false,
+        },
       });
     }),
 });

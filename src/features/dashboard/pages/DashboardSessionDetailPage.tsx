@@ -12,6 +12,7 @@ import { supabaseDefaultClient } from "~/lib/supabase/client";
 import { type NextPageWithLayout } from "~/pages/_app";
 import { api } from "~/utils/api";
 import { SessionInfoCard } from "../components/SessionInfoCard";
+import { DashboardQuestionsGridList } from "../components/DashboardQuestionsGridList";
 
 const DashboardSessionDetailPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
@@ -19,7 +20,7 @@ const DashboardSessionDetailPage: NextPageWithLayout = () => {
   const params = useParams();
 
   if (typeof window !== "undefined") {
-    const questionsChannel = supabaseDefaultClient
+    supabaseDefaultClient
       .channel("schema-db-changes")
       .on(
         "postgres_changes",
@@ -115,7 +116,7 @@ const DashboardSessionDetailPage: NextPageWithLayout = () => {
 
           <TabsContent value="popular">
             {getPopularQuestionsBySessionIdQuery.data ? (
-              <QuestionsGridList
+              <DashboardQuestionsGridList
                 questions={getPopularQuestionsBySessionIdQuery.data}
               />
             ) : (
@@ -124,7 +125,7 @@ const DashboardSessionDetailPage: NextPageWithLayout = () => {
           </TabsContent>
           <TabsContent value="recent">
             {getRecentQuestionsBySessionIdQuery.data ? (
-              <QuestionsGridList
+              <DashboardQuestionsGridList
                 questions={getRecentQuestionsBySessionIdQuery.data}
               />
             ) : (
