@@ -2,8 +2,10 @@ import { formatDistance } from "date-fns";
 import { ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
 import { api } from "~/utils/api";
 
 type QuestionCardProps = {
@@ -15,6 +17,7 @@ type QuestionCardProps = {
   likes: number;
   upvoted?: boolean;
   sessionId: string;
+  isPinned: boolean;
 };
 
 export const QuestionCard = (props: QuestionCardProps) => {
@@ -71,8 +74,9 @@ export const QuestionCard = (props: QuestionCardProps) => {
   };
 
   return (
-    <Card>
+    <Card className={cn(props.isPinned && "border-2 border-primary")}>
       <CardContent className="pt-6">
+        {props.isPinned && <Badge className="mb-4">Pinned</Badge>}
         <div className="flex items-start space-x-4">
           <Avatar>
             <AvatarImage src={props.userAvatar} alt={props.username} />

@@ -7,6 +7,8 @@ import {
 import { customAlphabet } from "nanoid";
 import { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { supabaseDefaultClient } from "~/lib/supabase/client";
+import { QuestionEvent } from "~/lib/supabase/events";
 
 export const questionSessionRouter = createTRPCRouter({
   createSession: protectedProcedure
@@ -115,7 +117,7 @@ export const questionSessionRouter = createTRPCRouter({
       await db.question.create({
         data: {
           body,
-          name,
+          name: name ?? Prisma.skip,
           userId: user.id,
           questionSessionId,
         },
@@ -141,17 +143,20 @@ export const questionSessionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      let orderQuestionsBy: Prisma.QuestionOrderByWithRelationInput = {};
+      let orderQuestionsBy:
+        | Prisma.QuestionOrderByWithRelationInput
+        | Prisma.QuestionOrderByWithRelationInput[]
+        | undefined = {};
 
       switch (input.sortBy) {
         case "popular":
-          orderQuestionsBy = { upvotes: "desc" };
+          orderQuestionsBy = [{ isPinned: "desc" }, { upvotes: "desc" }];
           break;
         case "recent":
-          orderQuestionsBy = { createdAt: "desc" };
+          orderQuestionsBy = [{ isPinned: "desc" }, { createdAt: "desc" }];
           break;
         default:
-          orderQuestionsBy = { createdAt: "desc" };
+          orderQuestionsBy = [{ isPinned: "desc" }, { createdAt: "desc" }];
       }
 
       return await ctx.db.question.findMany({
@@ -335,5 +340,56 @@ export const questionSessionRouter = createTRPCRouter({
           isPinned: false,
         },
       });
+
+      const overlaySettings = await db.overlaySettings.findUnique({
+        where: {
+          userId: user.id,
+        },
+        select: {
+          key: true,
+        },
+      });
+
+      const overlayChannel = supabaseDefaultClient.channel(
+        `overlay:${overlaySettings?.key}`,
+      );
+
+      await overlayChannel.send({
+        type: "broadcast",
+        event: QuestionEvent.PINNED,
+        payload: {
+          questionId: pinnedQuestion.id,
+        },
+      });
+    }),
+
+  getPinnedQuestionByStreamKey: publicProcedure
+    .input(
+      z.object({
+        streamKey: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { streamKey } = input;
+
+      const overlaySettings = await db.overlaySettings.findUnique({
+        where: {
+          key: streamKey,
+        },
+      });
+
+      if (!overlaySettings) return;
+
+      const pinnedQuestion = await db.question.findFirst({
+        where: {
+          questionSession: {
+            userId: overlaySettings.userId,
+          },
+          isPinned: true,
+        },
+      });
+
+      return pinnedQuestion;
     }),
 });

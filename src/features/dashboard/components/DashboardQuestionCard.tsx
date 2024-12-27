@@ -1,6 +1,7 @@
 import { formatDistance } from "date-fns";
-import { Check, Highlighter, Pin, ThumbsUp } from "lucide-react";
+import { Check, Pin, ThumbsUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import {
@@ -9,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { cn } from "~/lib/utils";
 import { api } from "~/utils/api";
 
 type DashboardQuestionCardProps = {
@@ -19,6 +21,7 @@ type DashboardQuestionCardProps = {
   timestamp: Date;
   likes: number;
   questionSessionId: string;
+  isPinned: boolean;
 };
 
 export const DashboardQuestionCard = (props: DashboardQuestionCardProps) => {
@@ -63,8 +66,9 @@ export const DashboardQuestionCard = (props: DashboardQuestionCardProps) => {
   };
 
   return (
-    <Card>
+    <Card className={cn(props.isPinned && "border-2 border-primary")}>
       <CardContent className="pt-6">
+        {props.isPinned && <Badge className="mb-4">Pinned</Badge>}
         <div className="flex items-start space-x-4">
           <Avatar>
             <AvatarImage src={props.userAvatar} alt={props.username} />
@@ -87,7 +91,7 @@ export const DashboardQuestionCard = (props: DashboardQuestionCardProps) => {
                 <TooltipTrigger>
                   <Button
                     onClick={handlePinQuestion}
-                    disabled={pinQuestionMutation.isPending}
+                    disabled={pinQuestionMutation.isPending || props.isPinned}
                     size="icon"
                     variant="secondary"
                   >

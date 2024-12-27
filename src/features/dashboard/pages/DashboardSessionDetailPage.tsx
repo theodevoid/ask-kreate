@@ -1,49 +1,53 @@
 import { useParams } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  type ReactElement,
-} from "react";
+import { useEffect, type ReactElement } from "react";
 import { DashboardLayout } from "~/components/layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { QuestionsGridList } from "~/features/question-session/components/QuestionsGridList";
 import { supabaseDefaultClient } from "~/lib/supabase/client";
 import { type NextPageWithLayout } from "~/pages/_app";
 import { api } from "~/utils/api";
-import { SessionInfoCard } from "../components/SessionInfoCard";
 import { DashboardQuestionsGridList } from "../components/DashboardQuestionsGridList";
+import { SessionInfoCard } from "../components/SessionInfoCard";
+import { useRouter } from "next/router";
 
 const DashboardSessionDetailPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
 
   const params = useParams();
+  const router = useRouter();
 
-  if (typeof window !== "undefined") {
-    supabaseDefaultClient
-      .channel("schema-db-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Question",
-        },
-        (payload) => {
-          void Promise.all([
-            apiUtils.questionSession.getQuestionsBySessionId.invalidate({
-              sessionId: params.sessionId as string,
-              sortBy: "popular",
-            }),
-            apiUtils.questionSession.getQuestionsBySessionId.invalidate({
-              sessionId: params.sessionId as string,
-              sortBy: "recent",
-            }),
-          ]);
-        },
-      )
-      .subscribe();
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined" && router.isReady) {
+      supabaseDefaultClient
+        .channel(
+          `dashboard-question-session:${router.query.sessionId as string}`,
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "Question",
+          },
+          (payload) => {
+            void Promise.all([
+              apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+                sessionId: router.query.sessionId as string,
+                sortBy: "popular",
+              }),
+              apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+                sessionId: router.query.sessionId as string,
+                sortBy: "recent",
+              }),
+            ]);
+          },
+        )
+        .subscribe();
+    }
+  }, [
+    apiUtils.questionSession.getQuestionsBySessionId,
+    router.isReady,
+    router.query.sessionId,
+  ]);
 
   const getSessionDetailsQuery = api.questionSession.getById.useQuery(
     {

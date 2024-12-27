@@ -13,6 +13,7 @@ type DashboardQuestionsGridListProps = {
       userId: string;
     }[];
     questionSessionId: string;
+    isPinned: boolean;
   }[];
 };
 
@@ -36,6 +37,7 @@ export const DashboardQuestionsGridList = (
                 id={question.id}
                 key={question.id}
                 questionSessionId={question.questionSessionId}
+                isPinned={question.isPinned}
               />
             </Reorder.Item>
           );

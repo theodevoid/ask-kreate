@@ -13,6 +13,7 @@ type QuestionsGridListProps = {
       userId: string;
     }[];
     questionSessionId: string;
+    isPinned: boolean;
   }[];
 };
 
@@ -35,6 +36,7 @@ export const QuestionsGridList = (props: QuestionsGridListProps) => {
                 id={question.id}
                 key={question.id}
                 upvoted={!!question.QuestionUpvotes?.length}
+                isPinned={question.isPinned}
               />
             </Reorder.Item>
           );

@@ -18,6 +18,7 @@ model Profile {
     email            String            @unique
     username         String?           @unique
     QuestionSessions QuestionSession[]
+    OverlaySettings  OverlaySettings?
 }
 
 model QuestionSession {
@@ -61,4 +62,13 @@ model QuestionUpvotes {
     createdAt DateTime @default(now())
 
     @@id([questionId, userId])
+}
+
+model OverlaySettings {
+    userId String  @id
+    user   Profile @relation(fields: [userId], references: [userId])
+
+    key String @unique
+
+    @@index([key])
 }

@@ -1,5 +1,5 @@
 import { generateFromEmail } from "unique-username-generator";
-
+import { createId } from "@paralleldrive/cuid2";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const profileRouter = createTRPCRouter({
@@ -21,6 +21,11 @@ export const profileRouter = createTRPCRouter({
         email: user.email!,
         username: generatedUsername,
         userId: user.id,
+        OverlaySettings: {
+          create: {
+            key: createId(),
+          },
+        },
       },
     });
   }),
