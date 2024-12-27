@@ -7,6 +7,7 @@ import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";
 import { useAuth } from "~/hooks/useAuth";
 import "~/styles/globals.css";
+import { Toaster } from "~/components/ui/sonner";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -30,8 +31,8 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
       >{`:root { --font-geist-sans: ${GeistSans.style.fontFamily};}}`}</style>
       <div className={GeistSans.className}>
         <Component {...pageProps} />
+        <Toaster />
       </div>
-      ,
     </>,
   );
 };

@@ -47,7 +47,7 @@ const QuestionOverlayPage = () => {
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-start space-x-4">
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 space-y-3">
             <p className="text-2xl font-medium leading-none">
               {getPinnedQuestionQuery.data?.name
                 ? getPinnedQuestionQuery.data?.name

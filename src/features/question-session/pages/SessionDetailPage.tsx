@@ -23,6 +23,7 @@ import {
   type AskQuestionFormSchema,
   askQuestionFormSchema,
 } from "../forms/ask-question";
+import { toast } from "sonner";
 
 const SessionDetailPage = () => {
   const QUESTION_CHARACTER_LIMIT = 280;
@@ -31,11 +32,24 @@ const SessionDetailPage = () => {
 
   const params = useParams();
 
-  const apiClient = api.useUtils();
+  const apiUtils = api.useUtils();
 
   const form = useForm<AskQuestionFormSchema>({
     resolver: zodResolver(askQuestionFormSchema),
   });
+
+  const invalidateGetQuestionQueries = async () => {
+    await Promise.all([
+      apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+        sessionId: params?.sessionId as string,
+        sortBy: "popular",
+      }),
+      apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+        sessionId: params?.sessionId as string,
+        sortBy: "recent",
+      }),
+    ]);
+  };
 
   const { data } = api.questionSession.getById.useQuery(
     {
@@ -71,9 +85,10 @@ const SessionDetailPage = () => {
   const createQuestionMutation = api.questionSession.createQuestion.useMutation(
     {
       onSuccess: async () => {
-        await apiClient.questionSession.getById.invalidate({
-          id: params.sessionId as string,
-        });
+        await invalidateGetQuestionQueries();
+        form.setValue("body", "");
+        form.setValue("name", "");
+        toast("Message sent🚀", { position: "top-center" });
       },
     },
   );
