@@ -4,28 +4,25 @@ import { useForm } from "react-hook-form";
 import { PageContainer } from "~/components/layout/PageContainer";
 import { SectionContainer } from "~/components/layout/SectionContainer";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Textarea } from "~/components/ui/textarea";
-import { SessionInfoCard } from "~/features/dashboard/components/SessionInfoCard";
-import { api } from "~/utils/api";
-import {
-  type AskQuestionFormSchema,
-  askQuestionFormSchema,
-} from "../forms/ask-question";
 import {
   Form,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Textarea } from "~/components/ui/textarea";
+import { SessionInfoCard } from "~/features/dashboard/components/SessionInfoCard";
 import { useAnonymousAuth } from "~/hooks/useAnonymousAuth";
-import { useQueryClient } from "@tanstack/react-query";
-import { QuestionCard } from "~/features/dashboard/components/QuestionCard";
+import { api } from "~/utils/api";
 import { QuestionsGridList } from "../components/QuestionsGridList";
+import {
+  type AskQuestionFormSchema,
+  askQuestionFormSchema,
+} from "../forms/ask-question";
 
 const SessionDetailPage = () => {
   const QUESTION_CHARACTER_LIMIT = 280;

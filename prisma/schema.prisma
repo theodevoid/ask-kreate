@@ -48,4 +48,16 @@ model Question {
     questionSessionId String
     questionSession   QuestionSession @relation(fields: [questionSessionId], references: [id])
     createdAt         DateTime        @default(now())
+
+    QuestionUpvotes QuestionUpvotes[]
+}
+
+model QuestionUpvotes {
+    question   Question @relation(fields: [questionId], references: [id])
+    questionId String
+    userId     String
+
+    createdAt DateTime @default(now())
+
+    @@id([questionId, userId])
 }

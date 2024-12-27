@@ -1,20 +1,18 @@
 import { formatDistance } from "date-fns";
 import { ThumbsUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 
-type QuestionCardProps = {
+type DashboardQuestionCardProps = {
   id: string;
   username: string;
   userAvatar: string;
   content: string;
   timestamp: Date;
   likes: number;
-  upvoted?: boolean;
 };
 
-export const QuestionCard = (props: QuestionCardProps) => {
+export const DashboardQuestionCard = (props: DashboardQuestionCardProps) => {
   const formatDate = (date: Date) =>
     formatDistance(props.timestamp, new Date(), { addSuffix: true });
 
@@ -37,10 +35,8 @@ export const QuestionCard = (props: QuestionCardProps) => {
           </div>
         </div>
         <div className="mt-4 flex items-center">
-          <Button size="sm" variant={props.upvoted ? "default" : "secondary"}>
-            <ThumbsUp className="mr-1 h-4 w-4" />
-            <span className="text-sm font-medium">{props.likes}</span>
-          </Button>
+          <ThumbsUp className="mr-1 h-4 w-4" />
+          <span className="text-sm font-medium">{props.likes}</span>
         </div>
       </CardContent>
     </Card>

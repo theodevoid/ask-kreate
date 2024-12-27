@@ -8,6 +8,10 @@ import { Card, CardContent } from "~/components/ui/card";
 import { type NextPageWithLayout } from "~/pages/_app";
 import { SessionInfoCard } from "../components/SessionInfoCard";
 import { QuestionCard } from "../components/QuestionCard";
+import { api } from "~/utils/api";
+import { useParams } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { QuestionsGridList } from "~/features/question-session/components/QuestionsGridList";
 
 const mockQuestions = [
   {
@@ -37,25 +41,96 @@ const mockQuestions = [
 ];
 
 const DashboardSessionDetailPage: NextPageWithLayout = () => {
+  const params = useParams();
+
+  const getSessionDetailsQuery = api.questionSession.getById.useQuery(
+    {
+      id: params?.sessionId as string,
+    },
+    {
+      enabled: !!params?.sessionId,
+    },
+  );
+
+  const getPopularQuestionsBySessionIdQuery =
+    api.questionSession.getQuestionsBySessionId.useQuery(
+      {
+        sessionId: params?.sessionId as string,
+        sortBy: "popular",
+      },
+      {
+        enabled: !!params?.sessionId,
+      },
+    );
+
+  const getRecentQuestionsBySessionIdQuery =
+    api.questionSession.getQuestionsBySessionId.useQuery(
+      {
+        sessionId: params?.sessionId as string,
+        sortBy: "recent",
+      },
+      {
+        enabled: !!params?.sessionId,
+      },
+    );
+
   return (
     <div>
       <div className="mb-8 flex flex-col">
-        <SessionInfoCard
-          code="1234ABCDE"
-          title="React: Components"
-          startDate={new Date()}
-          endDate={new Date()}
-          isActive
-        />
+        {getSessionDetailsQuery.data && (
+          <SessionInfoCard
+            code={getSessionDetailsQuery.data?.code}
+            title={getSessionDetailsQuery.data?.title}
+            startDate={getSessionDetailsQuery.data?.startDate}
+            endDate={getSessionDetailsQuery.data?.endDate}
+            isActive={getSessionDetailsQuery.data?.isActive}
+          />
+        )}
       </div>
 
       <div>
         <h4 className="mb-4 text-2xl font-semibold">Questions</h4>
-        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-          {mockQuestions.map((question) => (
-            <QuestionCard {...question} key={question.id} />
-          ))}
-        </div>
+        <Tabs defaultValue="popular">
+          <div className="flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger
+                className="data-[state=active]:bg-transparent"
+                value="popular"
+              >
+                Popular
+              </TabsTrigger>
+              <TabsTrigger
+                className="data-[state=active]:bg-transparent"
+                value="recent"
+              >
+                Recent
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="text-sm text-muted-foreground">
+              {getSessionDetailsQuery.data?.estimatedQuestionCount} Questions
+            </div>
+          </div>
+
+          <TabsContent value="popular">
+            {getPopularQuestionsBySessionIdQuery.data ? (
+              <QuestionsGridList
+                questions={getPopularQuestionsBySessionIdQuery.data}
+              />
+            ) : (
+              <p>Loading...</p>
+            )}
+          </TabsContent>
+          <TabsContent value="recent">
+            {getRecentQuestionsBySessionIdQuery.data ? (
+              <QuestionsGridList
+                questions={getRecentQuestionsBySessionIdQuery.data}
+              />
+            ) : (
+              <p>Loading...</p>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

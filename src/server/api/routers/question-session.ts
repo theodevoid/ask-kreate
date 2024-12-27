@@ -119,6 +119,17 @@ export const questionSessionRouter = createTRPCRouter({
           questionSessionId,
         },
       });
+
+      await db.questionSession.update({
+        where: {
+          id: questionSessionId,
+        },
+        data: {
+          estimatedQuestionCount: {
+            increment: 1,
+          },
+        },
+      });
     }),
 
   getQuestionsBySessionId: publicProcedure
@@ -155,6 +166,14 @@ export const questionSessionRouter = createTRPCRouter({
           name: true,
           userId: true,
           upvotes: true,
+          QuestionUpvotes: {
+            where: {
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true,
+            },
+          },
         },
         orderBy: orderQuestionsBy,
       });

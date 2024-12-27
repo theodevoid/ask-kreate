@@ -7,6 +7,9 @@ type QuestionsGridListProps = {
     body: string;
     createdAt: Date;
     upvotes: number;
+    QuestionUpvotes?: {
+      userId: string;
+    }[];
   }[];
 };
 
@@ -23,6 +26,7 @@ export const QuestionsGridList = (props: QuestionsGridListProps) => {
             username={question.name ?? ""}
             id={question.id}
             key={question.id}
+            upvoted={!!question.QuestionUpvotes?.length}
           />
         );
       })}
