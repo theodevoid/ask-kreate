@@ -42,6 +42,7 @@ model Question {
     name       String?
     isArchived Boolean @default(false)
     isPinned   Boolean @default(false)
+    upvotes    Int     @default(0)
 
     userId            String
     questionSessionId String

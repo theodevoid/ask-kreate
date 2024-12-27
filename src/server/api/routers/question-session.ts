@@ -5,6 +5,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { customAlphabet } from "nanoid";
+import { Prisma } from "@prisma/client";
 
 export const questionSessionRouter = createTRPCRouter({
   createSession: protectedProcedure
@@ -117,6 +118,45 @@ export const questionSessionRouter = createTRPCRouter({
           userId: user.id,
           questionSessionId,
         },
+      });
+    }),
+
+  getQuestionsBySessionId: publicProcedure
+    .input(
+      z.object({
+        sessionId: z.string(),
+        sortBy: z.enum(["popular", "recent"]),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      let orderQuestionsBy: Prisma.QuestionOrderByWithRelationInput = {};
+
+      switch (input.sortBy) {
+        case "popular":
+          orderQuestionsBy = { upvotes: "desc" };
+          break;
+        case "recent":
+          orderQuestionsBy = { createdAt: "desc" };
+          break;
+        default:
+          orderQuestionsBy = { createdAt: "desc" };
+      }
+
+      return await ctx.db.question.findMany({
+        where: {
+          questionSessionId: input.sessionId,
+        },
+        select: {
+          id: true,
+          body: true,
+          createdAt: true,
+          isArchived: true,
+          isPinned: true,
+          name: true,
+          userId: true,
+          upvotes: true,
+        },
+        orderBy: orderQuestionsBy,
       });
     }),
 });

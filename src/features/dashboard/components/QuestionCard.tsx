@@ -22,10 +22,12 @@ export const QuestionCard = (props: QuestionCardProps) => {
         <div className="flex items-start space-x-4">
           <Avatar>
             <AvatarImage src={props.userAvatar} alt={props.username} />
-            <AvatarFallback>{props.username.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{props.username.charAt(0) || "A"}</AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium leading-none">{props.username}</p>
+            <p className="text-sm font-medium leading-none">
+              {props.username ? props.username : "Anonymous"}
+            </p>
             <p className="text-sm text-muted-foreground">
               {formatDate(props.timestamp)}
             </p>

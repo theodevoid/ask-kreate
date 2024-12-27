@@ -25,6 +25,7 @@ import {
 import { useAnonymousAuth } from "~/hooks/useAnonymousAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { QuestionCard } from "~/features/dashboard/components/QuestionCard";
+import { QuestionsGridList } from "../components/QuestionsGridList";
 
 const SessionDetailPage = () => {
   const QUESTION_CHARACTER_LIMIT = 280;
@@ -47,6 +48,28 @@ const SessionDetailPage = () => {
       enabled: !!params?.sessionId,
     },
   );
+
+  const getPopularQuestionsBySessionIdQuery =
+    api.questionSession.getQuestionsBySessionId.useQuery(
+      {
+        sessionId: params?.sessionId as string,
+        sortBy: "popular",
+      },
+      {
+        enabled: !!params?.sessionId,
+      },
+    );
+
+  const getRecentQuestionsBySessionIdQuery =
+    api.questionSession.getQuestionsBySessionId.useQuery(
+      {
+        sessionId: params?.sessionId as string,
+        sortBy: "recent",
+      },
+      {
+        enabled: !!params?.sessionId,
+      },
+    );
 
   const createQuestionMutation = api.questionSession.createQuestion.useMutation(
     {
@@ -141,23 +164,23 @@ const SessionDetailPage = () => {
             </div>
 
             <TabsContent value="popular">
-              <div className="grid grid-cols-1 gap-4">
-                {data?.questions.map((question) => {
-                  return (
-                    <QuestionCard
-                      content={question.body}
-                      likes={0}
-                      timestamp={question.createdAt}
-                      userAvatar=""
-                      username={question.name ?? ""}
-                      id={question.id}
-                      key={question.id}
-                    />
-                  );
-                })}
-              </div>
+              {getPopularQuestionsBySessionIdQuery.data ? (
+                <QuestionsGridList
+                  questions={getPopularQuestionsBySessionIdQuery.data}
+                />
+              ) : (
+                <p>Loading...</p>
+              )}
             </TabsContent>
-            <TabsContent value="recent">Change your password here.</TabsContent>
+            <TabsContent value="recent">
+              {getRecentQuestionsBySessionIdQuery.data ? (
+                <QuestionsGridList
+                  questions={getRecentQuestionsBySessionIdQuery.data}
+                />
+              ) : (
+                <p>Loading...</p>
+              )}
+            </TabsContent>
           </Tabs>
         </div>
       </SectionContainer>
