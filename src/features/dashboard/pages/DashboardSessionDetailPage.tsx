@@ -1,47 +1,48 @@
-import { type ReactElement } from "react";
-import { DashboardLayout } from "~/components/layout/DashboardLayout";
-import {
-  DashboardSection,
-  DashboardSectionContent,
-} from "~/components/layout/DashboardSection";
-import { Card, CardContent } from "~/components/ui/card";
-import { type NextPageWithLayout } from "~/pages/_app";
-import { SessionInfoCard } from "../components/SessionInfoCard";
-import { QuestionCard } from "../components/QuestionCard";
-import { api } from "~/utils/api";
 import { useParams } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  type ReactElement,
+} from "react";
+import { DashboardLayout } from "~/components/layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { QuestionsGridList } from "~/features/question-session/components/QuestionsGridList";
-
-const mockQuestions = [
-  {
-    id: "1",
-    username: "Alice Johnson",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    content: "What new features can we expect in this product launch?",
-    timestamp: new Date(2023, 5, 2, 10, 30),
-    likes: 5,
-  },
-  {
-    id: "2",
-    username: "Bob Smith",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    content: "Will there be a beta testing phase for early adopters?",
-    timestamp: new Date(2023, 5, 2, 11, 15),
-    likes: 3,
-  },
-  {
-    id: "3",
-    username: "Charlie Brown",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    content: "How does this product compare to your competitors?",
-    timestamp: new Date(2023, 5, 2, 14, 0),
-    likes: 7,
-  },
-];
+import { supabaseDefaultClient } from "~/lib/supabase/client";
+import { type NextPageWithLayout } from "~/pages/_app";
+import { api } from "~/utils/api";
+import { SessionInfoCard } from "../components/SessionInfoCard";
 
 const DashboardSessionDetailPage: NextPageWithLayout = () => {
+  const apiUtils = api.useUtils();
+
   const params = useParams();
+
+  if (typeof window !== "undefined") {
+    const questionsChannel = supabaseDefaultClient
+      .channel("schema-db-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Question",
+        },
+        (payload) => {
+          void Promise.all([
+            apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+              sessionId: params.sessionId as string,
+              sortBy: "popular",
+            }),
+            apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+              sessionId: params.sessionId as string,
+              sortBy: "recent",
+            }),
+          ]);
+        },
+      )
+      .subscribe();
+  }
 
   const getSessionDetailsQuery = api.questionSession.getById.useQuery(
     {

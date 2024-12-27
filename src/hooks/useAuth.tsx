@@ -13,6 +13,8 @@ export const useAuth = () => {
 
   useEffect(() => {
     const subscription = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user.is_anonymous) return;
+
       if (session) {
         const userData = session.user;
 

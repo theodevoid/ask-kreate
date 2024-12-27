@@ -9,13 +9,16 @@ export const useAnonymousAuth = () => {
 
   const signInAnonymously = async () => {
     const { data: userData } = await supabase.auth.getUser();
+    console.log("🚀 ~ signInAnonymously ~ userData:", userData);
 
-    if (userData) {
+    if (userData.user) {
       setCurrentAnonymousUser(userData.user);
       return;
     }
 
-    const { data } = await supabase.auth.signInAnonymously();
+    const { data, error } = await supabase.auth.signInAnonymously();
+
+    console.log("🚀 ~ signInAnonymously ~ error:", error);
 
     setCurrentAnonymousUser(data.user);
   };

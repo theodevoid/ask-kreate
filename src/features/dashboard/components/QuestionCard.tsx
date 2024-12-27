@@ -1,8 +1,10 @@
 import { formatDistance } from "date-fns";
 import { ThumbsUp } from "lucide-react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { api } from "~/utils/api";
 
 type QuestionCardProps = {
   id: string;
@@ -12,11 +14,61 @@ type QuestionCardProps = {
   timestamp: Date;
   likes: number;
   upvoted?: boolean;
+  sessionId: string;
 };
 
 export const QuestionCard = (props: QuestionCardProps) => {
+  const apiUtils = api.useUtils();
+
   const formatDate = (date: Date) =>
     formatDistance(props.timestamp, new Date(), { addSuffix: true });
+
+  const upvoteQuestionMutation = api.questionSession.upvoteQuestion.useMutation(
+    {
+      onSuccess: async () => {
+        await Promise.all([
+          apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+            sessionId: props.sessionId,
+            sortBy: "popular",
+          }),
+          apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+            sessionId: props.sessionId,
+            sortBy: "recent",
+          }),
+        ]);
+      },
+    },
+  );
+
+  const removeUpvoteQuestionMutation =
+    api.questionSession.removeUpvoteQuestion.useMutation({
+      onSuccess: async () => {
+        await Promise.all([
+          apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+            sessionId: props.sessionId,
+            sortBy: "popular",
+          }),
+          apiUtils.questionSession.getQuestionsBySessionId.invalidate({
+            sessionId: props.sessionId,
+            sortBy: "recent",
+          }),
+        ]);
+      },
+    });
+
+  const toggleUpvote = () => {
+    if (
+      upvoteQuestionMutation.isPending ||
+      removeUpvoteQuestionMutation.isPending
+    )
+      return;
+
+    if (props.upvoted) {
+      removeUpvoteQuestionMutation.mutate({ questionId: props.id });
+    } else {
+      upvoteQuestionMutation.mutate({ questionId: props.id });
+    }
+  };
 
   return (
     <Card>
@@ -37,7 +89,15 @@ export const QuestionCard = (props: QuestionCardProps) => {
           </div>
         </div>
         <div className="mt-4 flex items-center">
-          <Button size="sm" variant={props.upvoted ? "default" : "secondary"}>
+          <Button
+            onClick={toggleUpvote}
+            disabled={
+              upvoteQuestionMutation.isPending ||
+              removeUpvoteQuestionMutation.isPending
+            }
+            size="sm"
+            variant={props.upvoted ? "default" : "secondary"}
+          >
             <ThumbsUp className="mr-1 h-4 w-4" />
             <span className="text-sm font-medium">{props.likes}</span>
           </Button>

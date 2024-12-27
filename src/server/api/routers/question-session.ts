@@ -6,6 +6,7 @@ import {
 } from "~/server/api/trpc";
 import { customAlphabet } from "nanoid";
 import { Prisma } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const questionSessionRouter = createTRPCRouter({
   createSession: protectedProcedure
@@ -168,14 +169,109 @@ export const questionSessionRouter = createTRPCRouter({
           upvotes: true,
           QuestionUpvotes: {
             where: {
-              userId: ctx.user?.id,
+              userId: ctx.user?.id ?? "",
             },
             select: {
               userId: true,
             },
           },
+          questionSessionId: true,
         },
         orderBy: orderQuestionsBy,
+      });
+    }),
+
+  removeUpvoteQuestion: protectedProcedure
+    .input(
+      z.object({
+        questionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { questionId } = input;
+
+      const questionIsUpvoted = await db.questionUpvotes.findUnique({
+        where: {
+          questionId_userId: {
+            questionId,
+            userId: user.id,
+          },
+        },
+      });
+
+      if (!questionIsUpvoted)
+        throw new TRPCError({
+          code: "UNPROCESSABLE_CONTENT",
+          message: "question is not upvoted yet",
+        });
+
+      await db.$transaction(async (tx) => {
+        await tx.question.update({
+          where: {
+            id: questionId,
+          },
+          data: {
+            upvotes: {
+              decrement: 1,
+            },
+          },
+        });
+
+        await tx.questionUpvotes.delete({
+          where: {
+            questionId_userId: {
+              questionId,
+              userId: user.id,
+            },
+          },
+        });
+      });
+    }),
+
+  upvoteQuestion: protectedProcedure
+    .input(
+      z.object({
+        questionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { questionId } = input;
+
+      const questionIsUpvoted = await db.questionUpvotes.findUnique({
+        where: {
+          questionId_userId: {
+            questionId,
+            userId: user.id,
+          },
+        },
+      });
+
+      if (questionIsUpvoted)
+        throw new TRPCError({
+          code: "UNPROCESSABLE_CONTENT",
+          message: "question is already upvoted",
+        });
+
+      await db.$transaction(async (tx) => {
+        await tx.question.update({
+          where: {
+            id: questionId,
+          },
+          data: {
+            upvotes: {
+              increment: 1,
+            },
+          },
+        });
+
+        await tx.questionUpvotes.create({
+          data: {
+            questionId,
+            userId: user.id,
+          },
+        });
       });
     }),
 });
