@@ -8,17 +8,17 @@ export const HeadMetaData: React.FC<{
   ogImageUrl?: string;
   pathname?: string;
 }> = ({
-  title = "Konten kamu berharga",
+  title = "Kepoin kreator favorite kamu",
   metaDescription,
-  ogImageUrl = env.NEXT_PUBLIC_OG_IMAGE_URL,
+  ogImageUrl,
   pathname = "",
 }) => {
-  const defaultTitle = "ask.kreate.gg";
+  const defaultTitle = "ask.voidfnc.com";
 
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : env.NEXT_PUBLIC_BASE_URL;
+      : process.env.NEXT_PUBLIC_BASE_URL;
 
   const pageUrl = new URL(pathname, baseUrl).toString();
 

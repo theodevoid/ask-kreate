@@ -6,7 +6,7 @@ export default {
   content: ["./src/**/*.tsx"],
   theme: {
     container: {
-      center: "true",
+      center: true,
     },
     extend: {
       fontFamily: {
