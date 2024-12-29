@@ -47,12 +47,50 @@ export const questionSessionRouter = createTRPCRouter({
       return questionSession;
     }),
 
+  updateSession: protectedProcedure
+    .input(
+      z.object({
+        title: z
+          .string()
+          .min(3, {
+            message: "Title must be at least 3 characters.",
+          })
+          .optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
+        isActive: z.boolean().default(true).optional(),
+        sessionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { endDate, isActive, startDate, title, sessionId } = input;
+
+      const questionSession = await db.questionSession.update({
+        where: {
+          id: sessionId,
+          userId: user.id,
+        },
+        data: {
+          endDate: endDate ?? Prisma.skip,
+          startDate: startDate ?? Prisma.skip,
+          title: title ?? Prisma.skip,
+          isActive: isActive ?? Prisma.skip,
+        },
+      });
+
+      return questionSession;
+    }),
+
   getAllSessions: protectedProcedure.query(async ({ ctx }) => {
     const { db, user } = ctx;
 
     const questionSessions = await db.questionSession.findMany({
       where: {
         userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 

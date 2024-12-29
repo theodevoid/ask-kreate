@@ -15,6 +15,7 @@ import { type CreateSessionFormSchema } from "../forms/create-session";
 type CreateSessionFormInnerProps = {
   onCreateSession: (values: CreateSessionFormSchema) => void;
   isLoading?: boolean;
+  buttonText?: string;
 };
 
 export const CreateSessionFormInner = (props: CreateSessionFormInnerProps) => {
@@ -91,7 +92,7 @@ export const CreateSessionFormInner = (props: CreateSessionFormInnerProps) => {
         type="submit"
         disabled={form.formState.isSubmitting || props.isLoading}
       >
-        Create Session
+        {props.buttonText ? props.buttonText : "Create Session"}
       </Button>
     </form>
   );

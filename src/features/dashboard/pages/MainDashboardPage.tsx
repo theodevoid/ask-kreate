@@ -24,20 +24,58 @@ import Link from "next/link";
 
 const MainDashboardPage: NextPageWithLayout = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [editDialogIsOpen, setEditDialogIsOpen] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState("");
 
   const form = useForm<CreateSessionFormSchema>({
     resolver: zodResolver(createSessionFormSchema),
   });
 
+  const editForm = useForm<CreateSessionFormSchema>({
+    resolver: zodResolver(createSessionFormSchema),
+  });
+
   const createQuestionSession = api.questionSession.createSession.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Session created!");
       setDialogIsOpen(false);
       form.reset();
+      await questionSessionQuery.refetch();
     },
   });
 
   const questionSessionQuery = api.questionSession.getAllSessions.useQuery();
+
+  const updateSessionMutation = api.questionSession.updateSession.useMutation({
+    onSuccess: async () => {
+      setEditDialogIsOpen(false);
+      editForm.reset();
+      await questionSessionQuery.refetch();
+    },
+  });
+
+  const handleUpdateSession = (
+    values: CreateSessionFormSchema & { id: string },
+  ) => {
+    updateSessionMutation.mutate({
+      ...values,
+      endDate: new Date(values.endDate),
+      startDate: new Date(values.startDate),
+      sessionId: values.id,
+    });
+  };
+
+  const handleEditModal = (
+    values: CreateSessionFormSchema & { id: string },
+  ) => {
+    editForm.setValue("endDate", values.endDate);
+    editForm.setValue("title", values.title);
+    editForm.setValue("isActive", values.isActive);
+    editForm.setValue("startDate", values.startDate);
+    setEditingSessionId(values.id);
+
+    setEditDialogIsOpen(true);
+  };
 
   const handleCreateSession = (values: CreateSessionFormSchema) => {
     createQuestionSession.mutate({
@@ -68,12 +106,31 @@ const MainDashboardPage: NextPageWithLayout = () => {
                   endDate={session.endDate}
                   isActive={session.isActive}
                   questionCount={session.estimatedQuestionCount}
+                  id={session.id}
+                  onEdit={handleEditModal}
                 />
               </Link>
             );
           })}
         </div>
       </div>
+
+      <Dialog onOpenChange={setEditDialogIsOpen} open={editDialogIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Session</DialogTitle>
+          </DialogHeader>
+          <Form {...editForm}>
+            <CreateSessionFormInner
+              isLoading={updateSessionMutation.isPending}
+              onCreateSession={(values) =>
+                handleUpdateSession({ ...values, id: editingSessionId })
+              }
+              buttonText="Edit Session"
+            />
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog onOpenChange={setDialogIsOpen} open={dialogIsOpen}>
         <DialogContent>

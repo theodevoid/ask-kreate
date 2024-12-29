@@ -24,6 +24,7 @@ import {
   askQuestionFormSchema,
 } from "../forms/ask-question";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 
 const SessionDetailPage = () => {
   const QUESTION_CHARACTER_LIMIT = 280;
@@ -117,49 +118,62 @@ const SessionDetailPage = () => {
         )}
 
         <div className="flex w-full flex-col gap-y-4 rounded-lg border p-6">
-          <Form {...form}>
-            <FormField
-              control={form.control}
-              name="body"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      className="resize-none border-0 bg-background p-0 text-lg"
-                      placeholder="Type your question"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription className="text-right">
-                    {QUESTION_CHARACTER_LIMIT - (field.value?.length ?? 0)}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex gap-4">
+          {data &&
+          (new Date() > data?.endDate ||
+            new Date() < data?.startDate ||
+            !data.isActive) ? (
+            <Alert variant="destructive">
+              <AlertTitle>Session is inactive</AlertTitle>
+              <AlertDescription>
+                The current session has either ended, not started, or has been
+                set inactive by the creator.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Form {...form}>
               <FormField
                 control={form.control}
-                name="name"
+                name="body"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Your name (optional)" {...field} />
+                      <Textarea
+                        className="resize-none border-0 bg-background p-0 text-lg"
+                        placeholder="Type your question"
+                        {...field}
+                      />
                     </FormControl>
+                    <FormDescription className="text-right">
+                      {QUESTION_CHARACTER_LIMIT - (field.value?.length ?? 0)}
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button
-                onClick={form.handleSubmit(handleSubmitQuestion)}
-                className="self-end"
-                disabled={createQuestionMutation.isPending}
-              >
-                Send Question
-              </Button>
-            </div>
-          </Form>
+              <div className="flex gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Your name (optional)" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  onClick={form.handleSubmit(handleSubmitQuestion)}
+                  className="self-end"
+                  disabled={createQuestionMutation.isPending}
+                >
+                  Send Question
+                </Button>
+              </div>
+            </Form>
+          )}
         </div>
 
         <div className="w-full">

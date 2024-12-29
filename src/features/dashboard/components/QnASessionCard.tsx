@@ -16,6 +16,23 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Form } from "~/components/ui/form";
+import { CreateSessionFormInner } from "./CreateSessionFormInner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  createSessionFormSchema,
+  type CreateSessionFormSchema,
+} from "../forms/create-session";
+import { useState } from "react";
+import { api } from "~/utils/api";
+import { propagateServerField } from "next/dist/server/lib/render-server";
 
 interface QnASessionCardProps {
   title: string;
@@ -24,6 +41,8 @@ interface QnASessionCardProps {
   endDate: Date;
   isActive: boolean;
   code: string;
+  id: string;
+  onEdit: (values: CreateSessionFormSchema & { id: string }) => void;
 }
 
 export const QnASessionCard = ({
@@ -33,6 +52,8 @@ export const QnASessionCard = ({
   endDate,
   isActive,
   code,
+  id,
+  onEdit,
 }: QnASessionCardProps) => {
   const formatDate = (date: Date) => format(date, "MMM dd");
 
@@ -67,7 +88,7 @@ export const QnASessionCard = ({
         </Badge>
 
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger onClick={(e) => e.preventDefault()}>
             <Button size="icon" variant="ghost">
               <Ellipsis />
             </Button>
@@ -76,12 +97,17 @@ export const QnASessionCard = ({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                alert("inactive");
+                onEdit({
+                  endDate: endDate.toISOString().split("T")[0]!,
+                  id,
+                  isActive,
+                  startDate: startDate.toISOString().split("T")[0]!,
+                  title,
+                });
               }}
             >
-              Set Inactive
+              Edit
             </DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardFooter>
