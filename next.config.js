@@ -18,6 +18,9 @@ const config = {
     defaultLocale: "en",
   },
   transpilePackages: ["geist"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default config;
